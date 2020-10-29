@@ -10,7 +10,8 @@ import core.validation as vali
 import core.sqlCore as sqlCore
 import images.baseInfo as ibaseInfo
 import source.baseInfo as sbaseInfo
-import common.Utils as utils
+import common.utils as utils
+import common.parameter as parameter
 import time
 
 
@@ -19,6 +20,7 @@ def analXml(imageXml, sourceXml, cfg):
     beginTime = time.time()
     if vali.__valiCfg(cfg) == False:
         return sqlCore.__errSql([False, 'cfg配置参数错误'])
+    parameter.xmlNamespace = cfg['xmlNamespace']
     imageBaseInfos = ibaseInfo.getImageCfg(imageXml)
     sourceBaseInfos = sbaseInfo.getSourceXmlCfg(sourceXml)
     sql = __core(imageBaseInfos, sourceBaseInfos)

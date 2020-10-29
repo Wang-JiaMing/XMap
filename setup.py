@@ -14,7 +14,7 @@ import setuptools
 setup(
     name='XMap',  # 包的名字
     author='wangjiaming',  # 作者
-    version='0.1.1',  # 版本号
+    version='0.1.2',  # 版本号
     license='',
 
     description='analysis common xml',  # 描述

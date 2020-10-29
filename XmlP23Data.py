@@ -40,11 +40,7 @@ xml='''<?xml version="1.0" encoding="utf-8"?>
       <id xCheck="1..1" xCheckKey="root" xTable="TB_SD23_PERSON" xValue="extension" xKey="ZYH" root="2.16.156.10011.1.12" extension="541926"/>  
       <!-- HDSD00.09.027	DE02.01.010.00	患者电话号码 -->  
       <!-- 移动电话 -->  
-      <telecom xCkeck="0..*" xValue="value" use="MP" value="13751724032"/>  
-      <!--HDSD00.09.013	DE02.01.010.00<	工作单位电话号码 -->  
-      <telecom use="WP" value=""/>  
-      <!-- HDSD00.09.028	DE02.01.012.00	患者电子邮件地址 -->  
-      <telecom use="EM" value="-"/>  
+      <telecom xCheck="0..*" xTable="TB_SD23_PERSON"  xKey="TELECOM"   xValue="value" use="MP" value="13751724032"/>
       <patient classCode="PSN" determinerCode="INSTANCE"> 
         <!-- DE02.01.030.00	患者的身份证件上的唯一法定标识符 -->  
         <id root="2.16.156.10011.1.3" extension="440228196504237922"/>  

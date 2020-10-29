@@ -6,7 +6,7 @@
     @File SqlCore
     @Desc:
 """
-import common.Utils as utils
+import common.utils as utils
 
 
 #    '错误日志sql'

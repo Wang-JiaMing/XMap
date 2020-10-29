@@ -6,10 +6,11 @@
     @File Utils
     @Desc:
 """
-import common.Parameter as param
+import common.parameter as param
 
 
 def removeNameSpaces(str):
+    print( param.xmlNamespace)
     return str.replace("{" + param.xmlNamespace + "}", '')
 
 
