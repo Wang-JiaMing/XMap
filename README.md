@@ -20,7 +20,7 @@
     - 目前暂只支持xmlNamespace(命名空间配置)
    
 ### 2.2 回参
- 
+参考第四章节回参
 
 ### 2.3 镜像Xml配置属性(*`重点`*)
 1.  xCheck  `必填[值域：0..1、0..*、1..1、1..*]`
@@ -93,7 +93,7 @@ sourceBaseInfo=
     text：标签对的值
 
 ## 三、自动化建表
-### 2.1 调用方法
+### 3.1 调用方法
     xMapCore.autoCreateTable(ImageData, {'xmlNamespace': 'urn:hl7-org:v3'})
 1. ImageData：`镜像xml字符串`
 3. {'xmlNamespace': 'urn:hl7-org:v3'}：`配置参数`
@@ -105,17 +105,18 @@ sourceBaseInfo=
     CREATED_TIME     DATE         default sysdate,
     UPDATED_BY       VARCHAR2(100),
     UPDATED_TIME     DATE,'] 扩展建表语句
+### 3.2 回参
+参考第四章节回参
 
-## 三、SQL回参
-### 3.1 错误日志SQL
-    若果校验不通过，将会短路返回错误日志插入语句，其中z_source_id需要替换成自己的变量，例如：
+## 四、SQL回参
+所有回参数以一维数组方式反馈，数据里存放0..*个SQL语句。例：
 ```sql
 insert into TB_CDA_ERR_LOG(source_id, error_msg)
 values (z_source_id,
         '校验不通过，约束节点规范是1..1,实际节点存在0;校验路径:/{urn:hl7-org:v3}ClinicalDocument/{urn:hl7-org:v3}recordTarget/{urn:hl7-org:v3}patientRole/{urn:hl7-org:v3}id[root=2.16.156.10011.1.19]')
 ```
 
-## 四、安装方式
+## 五、安装方式
 首先本地开发环境需要pip环境，通过pip对本地化tar.gz文件进行，命令如下:
 ```
     pip install %XMap_HOME%/Xmap-0.1.tar.gz
