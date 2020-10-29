@@ -20,7 +20,6 @@ def __valiCfg(cfg):
 
 
 def __valiSourceXML(imageBaseInfos, sourceBaseInfos):
-    print("开始数据源镜像校验")
     valiReuslts = []
     for imageBaseInfo in imageBaseInfos:
         if imageBaseInfo[0] != 'root':  # 根节点不校验
@@ -28,7 +27,6 @@ def __valiSourceXML(imageBaseInfos, sourceBaseInfos):
                 vr = __checkLen(column, sourceBaseInfos)
                 if vr[0] == False:
                     valiReuslts.append(vr)
-    print("结束数据源镜像校验")
     return valiReuslts
 
 
