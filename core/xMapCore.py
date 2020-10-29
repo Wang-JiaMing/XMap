@@ -36,14 +36,15 @@ def autoCreateTable(imageXml, cfg):
         if 'root' != imageXml[0]:
             createStr = "create table " + imageXml[0] + "("
             if 'expColumns' in cfg:
-                createStr=createStr+ cfg['expColumns']
+                createStr = createStr + cfg['expColumns']
             for columnsIndex in range(0, len(imageXml[2])):
                 if 'xKey' not in imageXml[2][columnsIndex][3]:
-                    createStr = createStr + utils.removeNameSpaces(imageXml[1])+' varchar2(50),'
+                    createStr = createStr + utils.removeNameSpaces(imageXml[1]) + ' varchar2(50),'
                 else:
                     for xKeyIndex in range(0, len((imageXml[2][columnsIndex][3]['xKey']).split(';'))):
-                        createStr = createStr + (imageXml[2][columnsIndex][3]['xKey']).split(';')[xKeyIndex]+' varchar2(50),'
-            createStr = createStr[0:len(createStr)-1] + ")"
+                        createStr = createStr + (imageXml[2][columnsIndex][3]['xKey']).split(';')[
+                            xKeyIndex] + ' varchar2(50),'
+            createStr = createStr[0:len(createStr) - 1] + ")"
             sql.append(createStr.upper())
     print("处理完成！一共生产【" + str(len(sql)) + "】条SQL数据，耗时：" + str(int(round((time.time() - beginTime) * 1000))) + 'ms')
     return sql
@@ -61,17 +62,19 @@ def __core(imageBaseInfos, sourceBaseInfos):
 # 分析表
 def __analysisTable(imageBaseInfos, sourceBaseInfos):
     allSql = []
-    global oneTableParams
-    global manyTableParams
+    oneTableParams = []
+    manyTableParams = []
     for images in imageBaseInfos:
         if images[0] != 'root' and images[1] == '-':
             oneTableParams = __oneTable(images, sourceBaseInfos)
         elif images[0] != 'root' and images[1] == 'loopDot':
             manyTableParams = __manyTable(images, sourceBaseInfos)
-    for sql1 in sqlCore.__getOneTableSql(oneTableParams):
-        allSql.append(sql1)
-    for sql1 in sqlCore.__getMaynTableSql(manyTableParams):
-        allSql.append(sql1)
+    if len(oneTableParams) > 0:
+        for sql1 in sqlCore.__getOneTableSql(oneTableParams):
+            allSql.append(sql1)
+    if len(manyTableParams) > 0:
+        for sql1 in sqlCore.__getMaynTableSql(manyTableParams):
+            allSql.append(sql1)
     return allSql
 
 

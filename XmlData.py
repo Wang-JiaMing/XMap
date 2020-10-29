@@ -110,13 +110,13 @@ xml='''<?xml version="1.0" encoding="UTF-8"?>
 			<code/>
                         <!--联系人地址-->
 			<addr>		
-				<houseNumber xCheck="0..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_HOUSENUMBER" xValue="text">黄埔大道西421号906房</houseNumber>
-				<streetName xCheck="0..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_STREETNAME" xValue="text"></streetName>
-				<township xCheck="0..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_TOWNSHIP" xValue="text"></township>
-				<county xCheck="0..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_COUNTY" xValue="text">天河区</county>
-				<city xCheck="0..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_CITY" xValue="text">广州市</city>
-				<state xCheck="0..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_STATE" xValue="text">广东省</state>
-				<postalCode xCheck="0..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_POSTALCODE" xValue="text">无</postalCode>
+				<houseNumber xCheck="1..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_HOUSENUMBER" xValue="text">黄埔大道西421号906房</houseNumber>
+				<streetName xCheck="1..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_STREETNAME" xValue="text"></streetName>
+				<township xCheck="1..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_TOWNSHIP" xValue="text"></township>
+				<county xCheck="1..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_COUNTY" xValue="text">天河区</county>
+				<city xCheck="1..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_CITY" xValue="text">广州市</city>
+				<state xCheck="1..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_STATE" xValue="text">广东省</state>
+				<postalCode xCheck="1..*" xTable="TB_SD1_PARTICIPANT" xKey="ADDR_POSTALCODE" xValue="text">无</postalCode>
 			</addr>
 			<!--电话号码-->
 			<telecom xCheck="1..*" xTable="TB_SD1_PARTICIPANT" xKey="TELECOM" xValue="value" use="H" value="13802447531"/>
