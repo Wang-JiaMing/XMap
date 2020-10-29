@@ -109,11 +109,12 @@ sourceBaseInfo=
 参考第四章节回参
 
 ## 四、SQL回参
-所有回参数以一维数组方式反馈，数据里存放0..*个SQL语句。例：
+所有回参结果以一维数组方式反馈，数据里存放0..*个SQL语句。例：
 ```sql
-insert into TB_CDA_ERR_LOG(source_id, error_msg)
+["insert into TB_CDA_ERR_LOG(source_id, error_msg)
 values (z_source_id,
-        '校验不通过，约束节点规范是1..1,实际节点存在0;校验路径:/{urn:hl7-org:v3}ClinicalDocument/{urn:hl7-org:v3}recordTarget/{urn:hl7-org:v3}patientRole/{urn:hl7-org:v3}id[root=2.16.156.10011.1.19]')
+        '校验不通过，约束节点规范是1..1,实际节点存在0;校验路径:/{urn:hl7-org:v3}ClinicalDocument/{urn:hl7-org:v3}recordTarget/{urn:hl7-org:v3}patientRole/{urn:hl7-org:v3}id[root=2.16.156.10011.1.19]')]"
+
 ```
 
 ## 五、安装方式
