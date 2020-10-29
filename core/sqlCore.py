@@ -10,16 +10,15 @@ import common.Utils as utils
 
 
 #    '错误日志sql'
-def errSql(vailResult):
+def __errSql(vailResult):
     sql = []
     for vali in vailResult:
-        sqlStr = "insert into TB_CDA_ERR_LOG(source_id, error_msg) values(z_source_id,'" + utils.removeNameSpaces(
-            str(vali[1]).replace('\'', '')) + "')"
+        sqlStr = "insert into TB_CDA_ERR_LOG(source_id, error_msg) values(z_source_id,'" + utils.removeNameSpaces(str(vali[1]).replace('\'', '')) + "')"
         sql.append(sqlStr)
     return sql
 
 
-def getOneTableSql(oneSqlParams):
+def __getOneTableSql(oneSqlParams):
     sql = []
     for table in oneSqlParams:
         feilds = ''
@@ -31,7 +30,7 @@ def getOneTableSql(oneSqlParams):
     return sql
 
 
-def getMaynTableSql(maySqlParams):
+def __getMaynTableSql(maySqlParams):
     sql = []
     for table in maySqlParams:
         feilds = ''

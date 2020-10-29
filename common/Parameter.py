@@ -7,4 +7,4 @@
     @Desc:
 """
 
-xml_namespace = 'urn:hl7-org:v3'
+xmlNamespace = ''

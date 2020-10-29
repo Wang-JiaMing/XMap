@@ -10,8 +10,8 @@ import common.Parameter as param
 
 
 def removeNameSpaces(str):
-    return str.replace("{" + param.xml_namespace + "}", '')
+    return str.replace("{" + param.xmlNamespace + "}", '')
 
 
 def resetXpath(root, str):
-    return str.replace(root, "").replace("{" + param.xml_namespace + "}", '')
+    return str.replace(root, "").replace("{" + param.xmlNamespace + "}", '')

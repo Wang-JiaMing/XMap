@@ -6,62 +6,87 @@
     @File valiXml
     @Desc:校验镜像xml与来源xml是否都存在该有的节点
 """
-import core.valiXml as vali
+import core.validation as vali
 import core.sqlCore as sqlCore
 import images.baseInfo as ibaseInfo
 import source.baseInfo as sbaseInfo
 import common.Utils as utils
-import XmlData
-import TestData
-import datetime
+import time
 
 
-# 解析主入口
-def main():
-    beginTime = datetime.datetime.now().microsecond
-    print(beginTime)
-    imageBaseInfos = ibaseInfo.getImageXmlInfo(XmlData.xml)
-    sourceBaseInfos = sbaseInfo.getImageXmlInfo(TestData.xml)
-    sql = core(imageBaseInfos, sourceBaseInfos)
-    print("处理完成！一共生产【" + str(len(sql)) + "】条SQL数据，耗时：" + str(( datetime.datetime.now().microsecond - beginTime)) + 'ms')
+# 解析XML主入口
+def analXml(imageXml, sourceXml, cfg):
+    beginTime = time.time()
+    if vali.__valiCfg(cfg) == False:
+        return sqlCore.__errSql([False, 'cfg配置参数错误'])
+    imageBaseInfos = ibaseInfo.getImageCfg(imageXml)
+    sourceBaseInfos = sbaseInfo.getSourceXmlCfg(sourceXml)
+    sql = __core(imageBaseInfos, sourceBaseInfos)
+    print("处理完成！一共生产【" + str(len(sql)) + "】条SQL数据，耗时：" + str(int(round((time.time() - beginTime) * 1000))) + 'ms')
+    return sql
+
+
+def autoCreateTable(imageXml, cfg):
+    sql = []
+    beginTime = time.time()
+    if vali.__valiCfg(cfg) == False:
+        return sqlCore.__errSql([False, 'cfg配置参数错误'])
+    imageBaseInfos = ibaseInfo.getImageCfg(imageXml)
+    for imageXml in imageBaseInfos:
+        if 'root' != imageXml[0]:
+            createStr = "create table " + imageXml[0] + "("
+            if 'expColumns' in cfg:
+                createStr=createStr+ cfg['expColumns']
+            for columnsIndex in range(0, len(imageXml[2])):
+                if 'xKey' not in imageXml[2][columnsIndex][3]:
+                    createStr = createStr + utils.removeNameSpaces(imageXml[1])+' varchar2(50),'
+                else:
+                    for xKeyIndex in range(0, len((imageXml[2][columnsIndex][3]['xKey']).split(';'))):
+                        createStr = createStr + (imageXml[2][columnsIndex][3]['xKey']).split(';')[xKeyIndex]+' varchar2(50),'
+            createStr = createStr[0:len(createStr)-1] + ")"
+            sql.append(createStr.upper())
+    print("处理完成！一共生产【" + str(len(sql)) + "】条SQL数据，耗时：" + str(int(round((time.time() - beginTime) * 1000))) + 'ms')
     return sql
 
 
 # 核心解析器
-def core(imageBaseInfos, sourceBaseInfos):
-    vailResult = vali.valiSourceXML(imageBaseInfos, sourceBaseInfos)
+def __core(imageBaseInfos, sourceBaseInfos):
+    vailResult = vali.__valiSourceXML(imageBaseInfos, sourceBaseInfos)
     if len(vailResult) > 0:
-        return sqlCore.errSql(vailResult)
+        return sqlCore.__errSql(vailResult)
     else:
-        return analysis(imageBaseInfos, sourceBaseInfos)
+        return __analysisTable(imageBaseInfos, sourceBaseInfos)
 
 
 # 分析表
-def analysis(imageBaseInfos, sourceBaseInfos):
+def __analysisTable(imageBaseInfos, sourceBaseInfos):
     allSql = []
     global oneTableParams
     global manyTableParams
     for images in imageBaseInfos:
         if images[0] != 'root' and images[1] == '-':
-            oneTableParams = oneTable(images, sourceBaseInfos)
+            oneTableParams = __oneTable(images, sourceBaseInfos)
         elif images[0] != 'root' and images[1] == 'loopDot':
-            manyTableParams = manyTable(images, sourceBaseInfos)
-    allSql.append(sqlCore.getOneTableSql(oneTableParams))
-    allSql.append(sqlCore.getMaynTableSql(manyTableParams))
+            manyTableParams = __manyTable(images, sourceBaseInfos)
+    for sql1 in sqlCore.__getOneTableSql(oneTableParams):
+        allSql.append(sql1)
+    for sql1 in sqlCore.__getMaynTableSql(manyTableParams):
+        allSql.append(sql1)
     return allSql
 
 
 # 单表解析
-def oneTable(imageBaseInfos, sourceBaseInfos):
+def __oneTable(imageBaseInfos, sourceBaseInfos):
     tableParams = []
     for imageBaseInfo in imageBaseInfos[2]:
-        for r in getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
+        for r in __getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
             vx = imageBaseInfo[3]['xValue'].split(';')
             for index in range(0, len(vx)):
                 tableName = imageBaseInfo[3]['xTable']
                 field = (utils.removeNameSpaces(imageBaseInfo[2]) if 'xKey' not in imageBaseInfo[3] else
                          imageBaseInfo[3]['xKey'].split(';')[index])
-                if 'text' != imageBaseInfo[3]['xValue'].split(';')[index] and 'z_' != imageBaseInfo[3]['xValue'].split(';')[index][0:2]:
+                if 'text' != imageBaseInfo[3]['xValue'].split(';')[index] and 'z_' != \
+                        imageBaseInfo[3]['xValue'].split(';')[index][0:2]:
                     xValue = r[3][vx[index]]
                 elif 'z_' != imageBaseInfo[3]['xValue'].split(';')[index][0:2]:
                     xValue = r[5]
@@ -88,34 +113,35 @@ def oneTable(imageBaseInfos, sourceBaseInfos):
 
 
 # 多表解析
-def manyTable(imageBaseInfos, sourceBaseInfos):
+def __manyTable(imageBaseInfos, sourceBaseInfos):
     tableParams = []  # [index,tableName,[field,value]]
-    loopDots = getSourceBaseInfos(imageBaseInfos[2][0], sourceBaseInfos)  # 获取循环点数量
+    loopDots = __getSourceBaseInfos(imageBaseInfos[2][0], sourceBaseInfos)  # 获取循环点数量
     for index in range(0, len(loopDots)):
         for imageBaseInfo in imageBaseInfos[2]:
-            for sourceBaseInfo in getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
+            for sourceBaseInfo in __getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
                 if index < len(loopDots) - 1:  # 有后继节点
                     if sourceBaseInfo[0] > loopDots[index][0] and sourceBaseInfo[0] < loopDots[index + 1][0]:
-                        manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams)
+                        __manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams)
                 else:  # 最后一个节点
                     if sourceBaseInfo[0] > loopDots[index][0]:
-                        manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams)
+                        __manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams)
     return tableParams
 
 
 # 多表数组
-def manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams):
+def __manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams):
     vx = imageBaseInfo[3]['xValue'].split(';')
     for vxIndex in range(0, len(vx)):
         tableName = imageBaseInfo[3]['xTable']
         field = (utils.removeNameSpaces(imageBaseInfo[2]) if 'xKey' not in imageBaseInfo[3] else
                  imageBaseInfo[3]['xKey'].split(';')[vxIndex])
-        if 'text' != imageBaseInfo[3]['xValue'].split(';')[vxIndex] and 'z_' != imageBaseInfo[3]['xValue'].split(';')[vxIndex][0:2]:
+        if 'text' != imageBaseInfo[3]['xValue'].split(';')[vxIndex] and 'z_' != imageBaseInfo[3]['xValue'].split(';')[
+                                                                                    vxIndex][0:2]:
             xValue = sourceBaseInfo[3][vx[vxIndex]]
         elif 'z_' != imageBaseInfo[3]['xValue'].split(';')[vxIndex][0:2]:
             xValue = sourceBaseInfo[5]
         else:
-            xValue=vx[vxIndex]
+            xValue = vx[vxIndex]
         tableArray = [field, xValue]
         inTableStatus = True
         for oTable in tableParams:
@@ -137,7 +163,7 @@ def manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams):
 
 
 # 获取baseInfo
-def getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
+def __getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
     sBaseInfos = []
     xCheck = imageBaseInfo[3]['xCheck']
     for sourceBaseInfo in sourceBaseInfos:

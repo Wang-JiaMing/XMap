@@ -15,7 +15,7 @@ unique_id = 1
 
 
 # 遍历所有的节点
-def walkData(root_node, level, result_list, path):
+def __walkData(root_node, level, result_list, path):
     global unique_id
     xpath = path + '/' + root_node.tag
     temp_list = [unique_id, level, root_node.tag, root_node.attrib, xpath,
@@ -27,15 +27,15 @@ def walkData(root_node, level, result_list, path):
     if len(children_node) == 0:
         return
     for child in children_node:
-        walkData(child, level + 1, result_list, xpath)
+        __walkData(child, level + 1, result_list, xpath)
     return
 
 
-def getImageXmlInfo(xml):
+def getSourceXmlCfg(xml):
     level = 1  # 节点的深度从1开始
     result_list = []
     try:
-        walkData(fromstring(xml), level, result_list, '')
+        __walkData(fromstring(xml), level, result_list, '')
     except Exception:
         logging.error("该数据格式不符合xml规则")
         traceback.print_exc()

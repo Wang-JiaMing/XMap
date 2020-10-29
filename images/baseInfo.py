@@ -13,7 +13,7 @@ unique_id = 1
 
 
 # 遍历所有的节点
-def walkData(root_node, level, result_list, path):
+def __walkData(root_node, level, result_list, path):
     global unique_id
     xpath = path + '/' + root_node.tag
     temp_list = [unique_id, level, root_node.tag, root_node.attrib, xpath]
@@ -35,14 +35,14 @@ def walkData(root_node, level, result_list, path):
     if len(children_node) == 0:
         return
     for child in children_node:
-        walkData(child, level + 1, result_list, xpath)
+        __walkData(child, level + 1, result_list, xpath)
     return
 
 
-def getImageXmlInfo(xml):
+def getImageCfg(xml):
     level = 1  # 节点的深度从1开始
     result_list = []
     # root = fromstring(xml).getroot()
-    walkData(fromstring(xml), level, result_list, '')
+    __walkData(fromstring(xml), level, result_list, '')
 
     return result_list
