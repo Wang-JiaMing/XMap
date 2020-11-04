@@ -6,7 +6,7 @@
     @File SqlCore
     @Desc:
 """
-import common.utils as utils
+import xCommon.utils as utils
 
 
 #    '错误日志sql'
@@ -20,13 +20,13 @@ def __errSql(vailResult):
 
 def __getOneTableSql(oneSqlParams):
     sql = []
-    for table in oneSqlParams:
+    for tableList in oneSqlParams:
         feilds = ''
         values = ''
-        for fav in table[1]:
-            feilds = ('' if feilds == '' else feilds + ',') + fav[0]
-            values = ('' if values == '' else values + ',') + "'" + fav[1] + "'"
-        sql.append('insert into ' + table[0].upper() + "(" + feilds.upper() + ")values(" + values + ")")
+        for feild in tableList[1]:
+            feilds = ('' if feilds == '' else feilds + ',') + feild[0]
+            values = ('' if values == '' else values + ',') + "'" + feild[1] + "'"
+        sql.append('insert into ' + tableList[0].upper() + "(" + feilds.upper() + ")values(" + values + ")")
     return sql
 
 

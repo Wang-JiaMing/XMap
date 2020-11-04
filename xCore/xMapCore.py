@@ -6,17 +6,20 @@
     @File valiXml
     @Desc:校验镜像xml与来源xml是否都存在该有的节点
 """
-import core.validation as vali
-import core.sqlCore as sqlCore
-import images.baseInfo as ibaseInfo
-import source.baseInfo as sbaseInfo
-import common.utils as utils
-import common.parameter as parameter
+import xCore.validation as vali
+import xCore.sqlCore as sqlCore
+import xImages.baseInfo as ibaseInfo
+import xSource.baseInfo as sbaseInfo
+import xCommon.utils as utils
+import xCommon.parameter as parameter
 import time
 
 
 # 解析XML主入口
 def analXml(imageXml, sourceXml, cfg):
+    ibaseInfo.unique_id = 0
+    sbaseInfo.unique_id = 0
+
     beginTime = time.time()
     if vali.__valiCfg(cfg) == False:
         return sqlCore.__errSql([False, 'cfg配置参数错误'])
@@ -64,19 +67,13 @@ def __core(imageBaseInfos, sourceBaseInfos):
 # 分析表
 def __analysisTable(imageBaseInfos, sourceBaseInfos):
     allSql = []
-    oneTableParams = []
-    manyTableParams = []
     for images in imageBaseInfos:
         if images[0] != 'root' and images[1] == '-':
-            oneTableParams = __oneTable(images, sourceBaseInfos)
+            for sqli in sqlCore.__getOneTableSql(__oneTable(images, sourceBaseInfos)):
+                allSql.append(sqli)
         elif images[0] != 'root' and images[1] == 'loopDot':
-            manyTableParams = __manyTable(images, sourceBaseInfos)
-    if len(oneTableParams) > 0:
-        for sql1 in sqlCore.__getOneTableSql(oneTableParams):
-            allSql.append(sql1)
-    if len(manyTableParams) > 0:
-        for sql1 in sqlCore.__getMaynTableSql(manyTableParams):
-            allSql.append(sql1)
+            for sqli in sqlCore.__getMaynTableSql(__manyTable(images, sourceBaseInfos)):
+                allSql.append(sqli)
     return allSql
 
 
@@ -92,7 +89,10 @@ def __oneTable(imageBaseInfos, sourceBaseInfos):
                          imageBaseInfo[3]['xKey'].split(';')[index])
                 if 'text' != imageBaseInfo[3]['xValue'].split(';')[index] and 'z_' != \
                         imageBaseInfo[3]['xValue'].split(';')[index][0:2]:
-                    xValue = r[3][vx[index]]
+                    if imageBaseInfo[3]['xValue'].split(';')[index] in r[3]:
+                        xValue = r[3][vx[index]]
+                    else:
+                        xValue = ''
                 elif 'z_' != imageBaseInfo[3]['xValue'].split(';')[index][0:2]:
                     xValue = r[5]
                 else:
@@ -121,7 +121,10 @@ def __oneTable(imageBaseInfos, sourceBaseInfos):
 def __manyTable(imageBaseInfos, sourceBaseInfos):
     tableParams = []  # [index,tableName,[field,value]]
     loopDots = __getSourceBaseInfos(imageBaseInfos[2][0], sourceBaseInfos)  # 获取循环点数量
+
+    # 遍历镜像所有循环节点标签
     for index in range(0, len(loopDots)):
+
         for imageBaseInfo in imageBaseInfos[2]:
             for sourceBaseInfo in __getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
                 if index < len(loopDots) - 1:  # 有后继节点
@@ -170,15 +173,37 @@ def __manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams):
 # 获取baseInfo
 def __getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
     sBaseInfos = []
-    xCheck = imageBaseInfo[3]['xCheck']
     for sourceBaseInfo in sourceBaseInfos:
         # 判断
         if imageBaseInfo[1] == sourceBaseInfo[1] and imageBaseInfo[2] == sourceBaseInfo[2] and imageBaseInfo[4] == \
                 sourceBaseInfo[4]:
-            if 'xCheckKey' in imageBaseInfo[3]:
-                _xCheckKey = imageBaseInfo[3]['xCheckKey']
-                if imageBaseInfo[3][_xCheckKey] == sourceBaseInfo[3][_xCheckKey]:
-                    sBaseInfos.append(sourceBaseInfo)
+            if 'xUniqueKey' in imageBaseInfo[3]:
+                if utils.valiXUniqueKey(imageBaseInfo[3]['xUniqueKey']):
+                    # 语法定位
+                    _xUniqueKey = utils.xUniqueKeyArray(imageBaseInfo[3]['xUniqueKey'])
+                    if 'u' == _xUniqueKey[0]:  # 上
+                        sourceNum = sourceBaseInfo[0] - _xUniqueKey[1]
+                        for sIndex in range(sourceNum, sourceBaseInfo[0]):
+                            if (utils.removeNameSpaces(sourceBaseInfos[sIndex][2].lower()) == _xUniqueKey[
+                                2].lower()) and (
+                                    _xUniqueKey[3] in sourceBaseInfos[sIndex][3]):
+                                # 是否有匹配上的值
+                                if sourceBaseInfos[sIndex][3][_xUniqueKey[3]] == imageBaseInfo[3][_xUniqueKey[3]]:
+                                    sBaseInfos.append(sourceBaseInfo)
+
+                    else:  # 下
+                        sourceNum = sourceBaseInfo[0] + _xUniqueKey[1]
+                        for sIndex in range(sourceBaseInfo[0]+1, sourceNum+1):
+                            if (utils.removeNameSpaces(sourceBaseInfos[sIndex][2].lower()) == _xUniqueKey[2].lower()) and (
+                                    _xUniqueKey[3] in sourceBaseInfos[sIndex][3]):
+                                if sourceBaseInfos[sIndex][3][_xUniqueKey[3]] == imageBaseInfo[3][_xUniqueKey[3]]:
+                                    sBaseInfos.append(sourceBaseInfo)
+
+                else:
+                    # 非语法定位
+                    if imageBaseInfo[3][imageBaseInfo[3]['xUniqueKey']] == sourceBaseInfo[3][
+                        imageBaseInfo[3]['xUniqueKey']]:
+                        sBaseInfos.append(sourceBaseInfo)
             else:
                 sBaseInfos.append(sourceBaseInfo)
     return sBaseInfos

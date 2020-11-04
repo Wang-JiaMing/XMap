@@ -1,4 +1,4 @@
-common
-core
-images
-source
+xCommon
+xCore
+xImages
+xSource
