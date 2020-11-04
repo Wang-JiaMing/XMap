@@ -58,6 +58,7 @@
         
 
 ### 2.4 xml重装配置数组定义
+1. 镜像重组配置
 ```
 imageBaseInfo=
 [
@@ -67,9 +68,6 @@ imageBaseInfo=
 ]
 ```
         
-1. 镜像重组配置
-
-
     tableName：表名
     loopType：是否为循环点，值域：-、loopDot【-否；loopDot是】
     unique_id：序号
@@ -77,6 +75,8 @@ imageBaseInfo=
     root_node.tag：标签
     root_node.attrib：属性
     xpath：标签路径
+
+2.源xml重组配置
 
 ```
 sourceBaseInfo=
@@ -90,9 +90,7 @@ sourceBaseInfo=
 ]
 ```
     
-2.源xml重组配置
-    
-       
+     
     unique_id：序号
     level：树层级
     root_node.tag：标签
