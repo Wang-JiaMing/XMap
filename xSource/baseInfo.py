@@ -11,7 +11,7 @@ from xml.etree.ElementTree import *
 import traceback
 import logging
 
-unique_id = 1
+unique_id = 0
 
 
 # 遍历所有的节点

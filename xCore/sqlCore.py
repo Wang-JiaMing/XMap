@@ -13,7 +13,7 @@ import xCommon.utils as utils
 def __errSql(vailResult):
     sql = []
     for vali in vailResult:
-        sqlStr = "insert into TB_CDA_ERR_LOG(source_id, error_msg) values(z_source_id,'" + utils.removeNameSpaces(str(vali[1]).replace('\'', '')) + "')"
+        sqlStr = "insert into TB_CDA_ERR_LOG(source_id, error_msg) values(\'z_source_id\',\'" + utils.removeNameSpaces(str(vali[1]).replace('\'', '')) + "')"
         sql.append(sqlStr)
     return sql
 

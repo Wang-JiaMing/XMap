@@ -10,7 +10,7 @@
 from xml.etree.ElementTree import *
 import xCommon.utils as utils
 
-unique_id = 1
+unique_id = 0
 
 
 # 遍历所有的节点

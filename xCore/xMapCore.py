@@ -32,6 +32,8 @@ def analXml(imageXml, sourceXml, cfg):
 
 
 def autoCreateTable(imageXml, cfg):
+    ibaseInfo.unique_id = 0
+
     sql = []
     beginTime = time.time()
     if vali.__valiCfg(cfg) == False:
@@ -120,11 +122,9 @@ def __oneTable(imageBaseInfos, sourceBaseInfos):
 # 多表解析
 def __manyTable(imageBaseInfos, sourceBaseInfos):
     tableParams = []  # [index,tableName,[field,value]]
-    loopDots = __getSourceBaseInfos(imageBaseInfos[2][0], sourceBaseInfos)  # 获取循环点数量
-
+    loopDots = __getSourceBaseInfosByLoop(imageBaseInfos[2][0], sourceBaseInfos)  # 获取循环点数量
     # 遍历镜像所有循环节点标签
     for index in range(0, len(loopDots)):
-
         for imageBaseInfo in imageBaseInfos[2]:
             for sourceBaseInfo in __getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
                 if index < len(loopDots) - 1:  # 有后继节点
@@ -170,7 +170,7 @@ def __manyTableArray(index, imageBaseInfo, sourceBaseInfo, tableParams):
             tableParams.append([index, imageBaseInfo[3]['xTable'], [tableArray]])
 
 
-# 获取baseInfo
+# 单表获取baseInfo
 def __getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
     sBaseInfos = []
     for sourceBaseInfo in sourceBaseInfos:
@@ -207,3 +207,48 @@ def __getSourceBaseInfos(imageBaseInfo, sourceBaseInfos):
             else:
                 sBaseInfos.append(sourceBaseInfo)
     return sBaseInfos
+
+
+'''
+ 循环表获取baseInfo
+    imageBaseInfoBeg:镜像开始节点
+    imageBaseInfoEnd:镜像结束节点
+    sourceBaseInfos:源数据
+
+ 
+'''
+def __getSourceBaseInfosByLoop(imageBaseInfoBeg, sourceBaseInfos):
+    sBaseInfos = []
+    for sourceBaseInfo in sourceBaseInfos:
+        # 判断层级、标签、路径
+        if imageBaseInfoBeg[1] == sourceBaseInfo[1] and imageBaseInfoBeg[2] == sourceBaseInfo[2] and imageBaseInfoBeg[4] == sourceBaseInfo[4]:
+            # 判断唯一值
+            if 'xUniqueKey' in imageBaseInfoBeg[3]:
+                if utils.valiXUniqueKey(imageBaseInfoBeg[3]['xUniqueKey']):
+                    # 语法定位
+                    _xUniqueKey = utils.xUniqueKeyArray(imageBaseInfoBeg[3]['xUniqueKey'])
+                    if 'u' == _xUniqueKey[0]:  # 上
+                        sourceNum = sourceBaseInfo[0] - _xUniqueKey[1]
+                        for sIndex in range(sourceNum, sourceBaseInfo[0]):
+                            if (utils.removeNameSpaces(sourceBaseInfos[sIndex][2].lower()) == _xUniqueKey[2].lower()) and (_xUniqueKey[3] in sourceBaseInfos[sIndex][3]):
+                                # 是否有匹配上的值
+                                if sourceBaseInfos[sIndex][3][_xUniqueKey[3]] == imageBaseInfoBeg[3][_xUniqueKey[3]]:
+                                    sBaseInfos.append(sourceBaseInfo)
+
+                    else:  # 下
+                        sourceNum = sourceBaseInfo[0] + _xUniqueKey[1]
+                        for sIndex in range(sourceBaseInfo[0]+1, sourceNum+1):
+                            if (utils.removeNameSpaces(sourceBaseInfos[sIndex][2].lower()) == _xUniqueKey[2].lower()) and (
+                                    _xUniqueKey[3] in sourceBaseInfos[sIndex][3]):
+                                if sourceBaseInfos[sIndex][3][_xUniqueKey[3]] == imageBaseInfoBeg[3][_xUniqueKey[3]]:
+                                    sBaseInfos.append(sourceBaseInfo)
+
+                else:
+                    # 非语法定位
+                    if imageBaseInfoBeg[3][imageBaseInfoBeg[3]['xUniqueKey']] == sourceBaseInfo[3][
+                        imageBaseInfoBeg[3]['xUniqueKey']]:
+                        sBaseInfos.append(sourceBaseInfo)
+            else:
+                sBaseInfos.append(sourceBaseInfo)
+    return sBaseInfos
+
