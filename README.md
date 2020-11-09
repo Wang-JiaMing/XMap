@@ -26,7 +26,19 @@
 1.  xCheck  `必填[值域：0..1、0..*、1..1、1..*]`
 
     只有存在xCheck的属性的xml才被扫描到，如果该属性下的xTable没携带xLooDots或者xLooDots=False，即0..\*或者1..\*,存在多个值情况下，会以`;`分割
-
+    
+    **`注意：xCheck的值域需符合木桶原理，尤其在循环点的取值，例如：`**
+ ```xml
+    <text xCheck="0..1" xLoopDots="True" xTable="TB_TEST">
+        <!--
+            此处xCheck配置错误，由于循环点最小允许0个节点，
+            所以循环体内的xCheck最小取之均以0开头,
+            而循环点最高是1个,如果循环体内容如果有多个需填*
+            简单总，起始以最小为准，结束以最多为准
+        -->
+        <name  xCheck="1..*" xTable="TB_TEST" xKey="name" xValue="text">xxx</name>
+    </text>
+```
 2. xUniqueKey `非必填`
 
     `xCheckKey更名为xUniqueKey`,唯一定位字段，用来定位与数据来源放进行校验；
