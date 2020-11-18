@@ -18,7 +18,7 @@ def resetXpath(root, str):
 
 
 def valiXUniqueKey(xUniqueKey):
-    if xUniqueKey.find(":") != -1 and xUniqueKey.find('/'):
+    if xUniqueKey.find(":") != -1 and xUniqueKey.find('/') and xUniqueKey!='':
         return True
     return False
 
