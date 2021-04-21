@@ -37,6 +37,8 @@ def getSourceXmlCfg(xml):
     try:
         __walkData(fromstring(xml), level, result_list, '')
     except Exception:
-        logging.error("该数据格式不符合xml规则")
-        traceback.print_exc()
+        xmlFormatError = Exception("数据格式不符合xml规则")
+        raise xmlFormatError  # 主动抛出异常
+
+
     return result_list

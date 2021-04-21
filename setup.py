@@ -11,10 +11,11 @@ try:
 except ImportError:
     from distutils.core import setup
 import setuptools
+
 setup(
     name='XMap',  # 包的名字
     author='wangjiaming',  # 作者
-    version='0.2.0',  # 版本号
+    version='0.2.6',  # 版本号
     license='',
 
     description='analysis xCommon xml',  # 描述
@@ -23,7 +24,7 @@ setup(
     url='',  # 可以写github上的地址，或者其他地址
     # 包内需要引用的文件夹
     # packages=setuptools.find_packages(exclude=['url2io',]),
-    packages=["xCommon","xCore","xImages","xSource",],
+    packages=["xCommon", "xCore", "xImages", "xSource", ],
     # keywords='NLP,tokenizing,Chinese word segementation',
     # package_dir={'jieba':'jieba'},
     # package_data={'jieba':['*.*','finalseg/*','analyse/*','posseg/*']},
